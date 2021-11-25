@@ -24,7 +24,7 @@ app.post("/api/shorturl", (req,res) =>{
   console.log(req.body);
   var s = '';
   if (req.body.url.startsWith("http://"))  
-    res.json({"url": req.body.url, "short_url": Math.floor(Math.random() * 10000)});
+    res.json({"url": req.body.url, "short_url": 1});
   else
     res.json({"error": "invalid url"});
 });
