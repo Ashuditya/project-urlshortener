@@ -60,6 +60,17 @@ app.post("/api/shorturl", bodyParser.urlencoded({extended: false}), (req,res) =>
     res.json({"error": "invalid url"});
 });
 
+app.get("/api/shorturl/:num", (req,res) => {
+  var {num} = req.params;
+  Url.findOne({short: num}, (err, data) => {
+    if(!err && data!=undefined){
+      res.redirect(data.url);
+    }else{
+      response.json("HTTP 404");
+    }
+  });
+});
+
 // Your first API endpoint
 app.get('/api/hello', function(req, res) {
   res.json({ greeting: 'hello API' });
