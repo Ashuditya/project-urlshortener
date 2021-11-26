@@ -29,35 +29,38 @@ app.get('/', function(req, res) {
   res.sendFile(process.cwd() + '/views/index.html');
 });
 
-let responseObject = {}
 app.post("/api/shorturl", bodyParser.urlencoded({extended: false}), (req,res) =>{
-  if (req.body.url.startsWith("http://")){
-    let s_url = 1;
-    responseObject['original_url'] = req.body.url;
-    Url.findOne({})
-    .sort({short: -1})
-    .exec((err, data) =>{
-      if(!err && data!=undefined)
-        s_url = data.short + 1;
-      if(!err){
-        Url.findOneAndUpdate(
-          {url: req.body.url}, //search
-          {url: req.body.url, short: s_url}, // update 
-          {new: true, upsert: true},
-          (err, data) => {
-            if(!err){
-              responseObject['short_url'] = data.short;
-              res.json(responseObject);
-            }
-          });
-      }else
-        res.json({"error": 'invalid url'});
+  var inputUrl = req.body.url;
+  let urlRegex = new RegExp(/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi)
+  
+  if(!inputUrl.match(urlRegex)){
+    response.json({error: 'Invalid URL'})
+    return
+  }
 
-      
-    });
-}
-  else
-    res.json({"error": "invalid url"});
+  let responseObject = {}
+  let s_url = 1;
+  responseObject['original_url'] = req.body.url;
+  Url.findOne({})
+  .sort({short: -1})
+  .exec((err, data) =>{
+    if(!err && data!=undefined)
+      s_url = data.short + 1;
+    if(!err){
+      Url.findOneAndUpdate(
+        {url: req.body.url}, //search
+        {url: req.body.url, short: s_url}, // update 
+        {new: true, upsert: true},
+        (err, data) => {
+          if(!err){
+            responseObject['short_url'] = data.short;
+            res.json(responseObject);
+          }
+        });
+    }
+
+    
+  });
 });
 
 app.get("/api/shorturl/:num", (req,res) => {
