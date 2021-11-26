@@ -33,7 +33,7 @@ let responseObject = {}
 app.post("/api/shorturl", bodyParser.urlencoded({extended: false}), (req,res) =>{
   if (req.body.url.startsWith("http://")){
     let s_url = 1;
-    responseObject['inputUrl'] = req.body.url;
+    responseObject['original_url'] = req.body.url;
     Url.findOne({})
     .sort({short: -1})
     .exec((err, data) =>{
@@ -46,7 +46,7 @@ app.post("/api/shorturl", bodyParser.urlencoded({extended: false}), (req,res) =>
           {new: true, upsert: true},
           (err, data) => {
             if(!err){
-              responseObject['shortUrl'] = data.short;
+              responseObject['short_url'] = data.short;
               res.json(responseObject);
             }
           });
