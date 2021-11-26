@@ -5,7 +5,7 @@ const cors = require('cors');
 const app = express();
 const mongoose = require('mongoose');
 const { response } = require('express');
-mongoose.connect(process.env.MONGO_URI);
+mongoose.connect("mongodb+srv://ashuditya:ashu12345@cluster0.rcilr.mongodb.net/myFirstDatabase?retryWrites=true&w=majority");
 
 
 const urlSchema = mongoose.Schema({
