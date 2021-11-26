@@ -34,7 +34,7 @@ app.post("/api/shorturl", bodyParser.urlencoded({extended: false}), (req,res) =>
   let urlRegex = new RegExp(/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi)
   
   if(!inputUrl.match(urlRegex)){
-    response.json({error: 'Invalid URL'})
+    response.json({error: 'invalid url'})
     return
   }
 
