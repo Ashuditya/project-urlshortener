@@ -3,12 +3,21 @@ const express = require('express');
 var bodyParser = require("body-parser");
 const cors = require('cors');
 const app = express();
+const mongoose = require('mongoose');
+const { response } = require('express');
+mongoose.connect(process.env.MONGO_URI);
 
-var num = null;
-var add = null;
+
+const urlSchema = mongoose.Schema({
+  url : {type: String, required: true},
+  short : Number
+});
+
+let Url = mongoose.model("Url", urlSchema);
+
 
 // Basic Configuration
-app.use(bodyParser.urlencoded({extended: false}));
+// app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 const port = process.env.PORT || 3000;
 
@@ -20,23 +29,36 @@ app.get('/', function(req, res) {
   res.sendFile(process.cwd() + '/views/index.html');
 });
 
-app.post("/api/shorturl", (req,res) =>{
-  console.log(req.body);
-  var s = '';
-  if (req.body.url.startsWith("http://"))  
-    res.json({"url": req.body.url, "short_url": 1});
+let responseObject = {}
+app.post("/api/shorturl", bodyParser.urlencoded({extended: false}), (req,res) =>{
+  if (req.body.url.startsWith("http://")){
+    let s_url = 1;
+    responseObject['inputUrl'] = req.body.url;
+    Url.findOne({})
+    .sort({short: -1})
+    .exec((err, data) =>{
+      if(!err && data!=undefined)
+        s_url = data.short + 1;
+      if(!err){
+        Url.findOneAndUpdate(
+          {url: req.body.url}, //search
+          {url: req.body.url, short: s_url}, // update 
+          {new: true, upsert: true},
+          (err, data) => {
+            if(!err){
+              responseObject['shortUrl'] = data.short;
+              res.json(responseObject);
+            }
+          });
+      }
+
+      
+    });
+}
   else
     res.json({"error": "invalid url"});
 });
-app.get("/api/shorturl/:surl", (req,res) => {
-  var {surl} = req.params;
-  if (surl===num){
-    
-  }else{
 
-  }
-  
-});
 // Your first API endpoint
 app.get('/api/hello', function(req, res) {
   res.json({ greeting: 'hello API' });
