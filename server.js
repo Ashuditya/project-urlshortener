@@ -74,7 +74,7 @@ app.get("/api/shorturl/:num", (req,res) => {
 // Your first API endpoint
 app.get('/api/hello', function(req, res) {
   res.json({ greeting: 'hello API' });
-});
+}); //change
 
 app.listen(port, function() {
   console.log(`Listening on port ${port}`);
