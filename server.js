@@ -50,7 +50,8 @@ app.post("/api/shorturl", bodyParser.urlencoded({extended: false}), (req,res) =>
               res.json(responseObject);
             }
           });
-      }
+      }else
+        res.json({"error": 'invalid url'});
 
       
     });
