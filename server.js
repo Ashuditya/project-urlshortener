@@ -31,11 +31,19 @@ app.get('/', function(req, res) {
 
 app.post("/api/shorturl", bodyParser.urlencoded({extended: false}), (req,res) =>{
   var inputUrl = req.body.url;
-  let urlRegex = new RegExp(/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi)
+  console.log(inputUrl);
+  // let urlRegex = new RegExp(/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi)
   
-  if(!inputUrl.match(urlRegex)){
-    response.json({error: 'invalid url'})
-    return
+  // if(!inputUrl.match(urlRegex)){
+  //   res.json({error: 'invalid url'})
+  //   return
+  // }
+  
+  if(!inputUrl.startsWith("http")){
+    res.json({
+      error: 'invalid url'
+    });
+    return;
   }
 
   let responseObject = {}
@@ -54,7 +62,10 @@ app.post("/api/shorturl", bodyParser.urlencoded({extended: false}), (req,res) =>
         (err, data) => {
           if(!err){
             responseObject['short_url'] = data.short;
-            res.json(responseObject);
+            res.json({
+              original_url: req.body.url,
+              short_url: data.short
+            });
           }
         });
     }
@@ -66,10 +77,12 @@ app.post("/api/shorturl", bodyParser.urlencoded({extended: false}), (req,res) =>
 app.get("/api/shorturl/:num", (req,res) => {
   var {num} = req.params;
   Url.findOne({short: num}, (err, data) => {
+    console.log(data);
+    console.log("-------------------------------------------");
     if(!err && data!=undefined){
       res.redirect(data.url);
     }else{
-      response.json("HTTP 404");
+      res.json({error: 'invalid url'});
     }
   });
 });
